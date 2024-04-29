@@ -3,7 +3,6 @@ import logo from './doctor.svg';
 import './App.css';
 
 function App() {
-  const GOOGLE_SHEETS_API_AUTH = require('./med-app-key.json');
   const [answers, setAnswers] = useState(Array(5).fill(null));
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [showResults, setShowResults] = useState(false);
