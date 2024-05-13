@@ -55,7 +55,7 @@ function App() {
       try {
         const response = await axios.post('http://localhost:3001/update-sheet', {
           answers,
-          score: calculateScore(answers),
+          score: calculateScore(),
         });
         console.log(response.data);
       } catch (error) {
@@ -64,8 +64,7 @@ function App() {
     }
   };
 
-  const calculateScore = (answers) => {
-    let score = 5;
+  const calculateScore = () => {
     return "type 1";
   };
 
