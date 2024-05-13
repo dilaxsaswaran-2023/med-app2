@@ -1,61 +1,72 @@
 import React, { useState } from 'react';
 import logo from './doctor.svg';
 import './App.css';
+import axios from 'axios'; // Import Axios for making HTTP requests
 
 function App() {
-  const [answers, setAnswers] = useState(Array(5).fill(null));
+  const [answers, setAnswers] = useState(Array(6).fill(null));
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [showResults, setShowResults] = useState(false);
-  const [selectedAnswers, setSelectedAnswers] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
 
   const questions = [
     {
-      question: "What is 1 + 1?",
-      answers: ["1", "2", "3"]
+      question: "Parity",
+      answers: ["Nullipara", "Multipara"]
     },
     {
-      question: "What is the capital of France?",
-      answers: ["London", "Berlin", "Paris"]
+      question: "Previous CS",
+      answers: ["Yes (One or more)", "No"]
     },
     {
-      question: "What is the tallest mountain in the world?",
-      answers: ["Mount Everest", "K2", "Kangchenjunga"]
+      question: "Onset of labour",
+      answers: ["Spontaneous", "Induced", "No labour (pre-labour CS)"]
     },
     {
-      question: "Who wrote 'To Kill a Mockingbird'?",
-      answers: ["Harper Lee", "J.K. Rowling", "Stephen King"]
+      question: "Number of fetuses",
+      answers: ["Singleton", "Multiple"]
     },
     {
-      question: "What is the chemical symbol for water?",
-      answers: ["H2O", "CO2", "NaCl"]
-    }
+      question: "Gestational age",
+      answers: ["Preterm (less than 37 weeks)", "Term (37 weeks or more)"]
+    },
+    {
+      question: "Fetal lie and presentation",
+      answers: ["Cephalic presentation", "Breech presentation", "Transverse lie"]
+    },
   ];
 
   const handleAnswerChange = (value) => {
     const newAnswers = [...answers];
     newAnswers[currentQuestion] = value;
     setAnswers(newAnswers);
-    setSelectedAnswers(prevAnswers => [...prevAnswers, { question: currentQuestion + 1, answer: value }]);
     setErrorMessage('');
   };
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = async () => {
     if (answers[currentQuestion] === null) {
       setErrorMessage('Please select an answer');
       return;
     }
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
-      console.log("Selected Answers:", selectedAnswers);
-      setAnswers(prevAnswers => {
-        const newAnswers = [...prevAnswers];
-        newAnswers[currentQuestion] = null;
-        return newAnswers;
-      });
     } else {
       setShowResults(true);
+      try {
+        const response = await axios.post('http://localhost:3001/update-sheet', {
+          answers,
+          score: calculateScore(answers),
+        });
+        console.log(response.data);
+      } catch (error) {
+        console.error('Error updating spreadsheet:', error);
+      }
     }
+  };
+
+  const calculateScore = (answers) => {
+    let score = 5;
+    return "type 1";
   };
 
   const renderQuestion = () => {
@@ -77,8 +88,7 @@ function App() {
   };
 
   const renderResults = () => {
-    let score = answers.reduce((acc, answer) => acc + (answer === '2' || answer === 'Paris' || answer === 'Mount Everest' || answer === 'Harper Lee' || answer === 'H2O' ? 1 : 0), 0);
-    console.log("Selected Answers:", selectedAnswers);
+    let score = calculateScore(answers);
     return <p>Your score is: {score}/5</p>;
   };
 
